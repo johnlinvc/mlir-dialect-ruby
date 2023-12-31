@@ -30,5 +30,5 @@ namespace :dialect do
     system(cmd, chdir: build_dir)
   end
 
-  task default: %i[configure build]
 end
+task dialect: %i[dialect:configure dialect:build]
