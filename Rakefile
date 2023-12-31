@@ -2,7 +2,7 @@
 
 require "bundler/gem_tasks"
 require "minitest/test_task"
-require 'fileutils'
+require "fileutils"
 
 Minitest::TestTask.create
 
@@ -13,7 +13,6 @@ RuboCop::RakeTask.new
 task default: %i[test rubocop]
 
 namespace :dialect do
-
   prefix = "/Users/johnlinvc/projs/ruby-mlir/llvm-project/build"
   build_dir = "./ext/standalone/build"
 
@@ -29,6 +28,5 @@ namespace :dialect do
     cmd = "cmake --build . --target check-standalone"
     system(cmd, chdir: build_dir)
   end
-
 end
 task dialect: %i[dialect:configure dialect:build]
