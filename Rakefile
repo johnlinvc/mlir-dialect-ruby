@@ -25,7 +25,7 @@ namespace :dialect do
 
   desc "build using cmake"
   task :build do
-    cmd = "cmake --build . --target check-standalone"
+    cmd = "cmake --build . --target check-ruby"
     system(cmd, chdir: build_dir)
   end
 end

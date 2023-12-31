@@ -6,10 +6,10 @@
 //
 //===----------------------------------------------------------------------===//
 
-#include "Standalone-c/Dialects.h"
+#include "Ruby-c/Dialects.h"
 
-#include "Standalone/StandaloneDialect.h"
+#include "Ruby/RubyDialect.h"
 #include "mlir/CAPI/Registration.h"
 
-MLIR_DEFINE_CAPI_DIALECT_REGISTRATION(Standalone, standalone,
-                                      mlir::standalone::StandaloneDialect)
+MLIR_DEFINE_CAPI_DIALECT_REGISTRATION(Ruby, ruby,
+                                      mlir::ruby::RubyDialect)
