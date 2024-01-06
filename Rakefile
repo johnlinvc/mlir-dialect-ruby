@@ -16,10 +16,15 @@ namespace :dialect do
   prefix = "/Users/johnlinvc/projs/ruby-mlir/llvm-project/build"
   build_dir = "./ext/standalone/build"
 
+  desc "clean up build dir"
+  task :clean do
+    FileUtils.rm_rf build_dir
+  end
+
   desc "configure using cmake"
   task :configure do
     FileUtils.mkdir_p build_dir
-    cmd = "cmake -G Ninja .. -DMLIR_DIR=#{prefix}/lib/cmake/mlir -DLLVM_EXTERNAL_LIT=#{prefix}/bin/llvm-lit"
+    cmd = "cmake -G 'Unix Makefiles' .. -DMLIR_DIR=#{prefix}/lib/cmake/mlir -DLLVM_EXTERNAL_LIT=#{prefix}/bin/llvm-lit"
     system(cmd, chdir: build_dir)
   end
 
