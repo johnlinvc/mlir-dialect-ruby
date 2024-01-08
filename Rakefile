@@ -24,7 +24,11 @@ namespace :dialect do
   desc "configure using cmake"
   task :configure do
     FileUtils.mkdir_p build_dir
-    cmd = "cmake -G 'Unix Makefiles' .. -DMLIR_DIR=#{prefix}/lib/cmake/mlir -DLLVM_EXTERNAL_LIT=#{prefix}/bin/llvm-lit"
+    ENV["LDFLAGS"]="-L/opt/homebrew/opt/llvm/lib"
+    ENV["CPPFLAGS"]="-I/opt/homebrew/opt/llvm/include"
+    ENV["PATH"]="/opt/homebrew/opt/llvm/bin:#{ENV["PATH"]}"
+    system("env")
+    cmd = "cmake -G 'Unix Makefiles' .. -DMLIR_DIR=#{prefix}../mlir/lib/cmake/mlir -DLLVM_BINARY_DIR=#{prefix} -DLLVM_MAIN_SRC_DIR=#{prefix}/../llvm -DLLVM_EXTERNAL_LIT=#{prefix}/bin/llvm-lit -DLLVM_ENABLE_LLD=ON"
     system(cmd, chdir: build_dir)
   end
 

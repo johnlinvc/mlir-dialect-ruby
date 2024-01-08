@@ -10,11 +10,9 @@
 #define RUBY_OPS
 
 include "Ruby/RubyTypes.td"
-include "mlir/Interfaces/InferTypeOpInterface.td"
 include "mlir/Interfaces/SideEffectInterfaces.td"
 
-def Ruby_FooOp : Ruby_Op<"foo", [Pure,
-                                             SameOperandsAndResultType]> {
+def Ruby_FooOp : Ruby_Op<"foo", [Pure]> {
     let summary = "Illustrates how to define an operation.";
     let description = [{
         The `ruby.foo` operation illustrates how to define a new
