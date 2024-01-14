@@ -7,10 +7,10 @@ module {
         // CHECK: %{{.*}} = ruby.foo %{{.*}} : i32
         %res = ruby.foo %0 : i32
 
-        // CHECK: %{{.*}} = ruby.constant_int "1" : <"">
-        %1 = ruby.constant_int "1" : <"">
-        // Check: %{{.*}} = ruby.local_var_write "foo" = %1 : <"">
-        %2 = ruby.local_var_write "foo" = %1 : <""> -> <"">
+        // CHECK: %{{.*}} = ruby.constant_int "1" : !ruby.int
+        %1 = ruby.constant_int "1" : !ruby.int
+        // Check: %{{.*}} = ruby.local_var_write "foo" = %1 : ruby.int -> ruby.int
+        %2 = ruby.local_var_write "foo" = %1 : !ruby.int -> !ruby.int
 
 
         return

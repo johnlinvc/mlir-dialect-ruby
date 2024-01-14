@@ -31,8 +31,8 @@ def Ruby_CustomType : Ruby_Type<"Custom", "custom"> {
 def Ruby_IntegerType : Ruby_Type<"Integer", "int"> {
     let summary = "Ruby integer type";
     let description = "Integer type in ruby dialect";
-    let parameters = (ins StringRefParameter<"the integer value">:$value);
-    let assemblyFormat = "`<` $value `>`";
+    let parameters = (ins DefaultValuedParameter<"StringAttr", "$_builder.getStringAttr(\"0\")">:$value);
+    let assemblyFormat = "(`<` $value^ `>`)?";
 }
 
 #endif // RUBY_TYPES
