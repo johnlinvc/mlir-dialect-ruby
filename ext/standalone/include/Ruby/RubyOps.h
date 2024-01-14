@@ -15,6 +15,7 @@
 #include "mlir/Interfaces/InferTypeOpInterface.h"
 #include "mlir/Interfaces/SideEffectInterfaces.h"
 
+#include "Ruby/RubyTypes.h"
 #define GET_OP_CLASSES
 #include "Ruby/RubyOps.h.inc"
 

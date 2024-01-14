@@ -12,6 +12,15 @@
 include "Ruby/RubyTypes.td"
 include "mlir/Interfaces/SideEffectInterfaces.td"
 
+def Ruby_ConstantIntOp : Ruby_Op<"constant_int", []> {
+    let arguments = (ins StrAttr:$input);
+    let results = (outs Ruby_IntegerType:$res);
+
+    let assemblyFormat = [{
+        $input attr-dict `:` type($res)
+    }];
+}
+
 def Ruby_FooOp : Ruby_Op<"foo", [Pure]> {
     let summary = "Illustrates how to define an operation.";
     let description = [{
