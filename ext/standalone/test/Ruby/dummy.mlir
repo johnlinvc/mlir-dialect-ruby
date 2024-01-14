@@ -8,7 +8,10 @@ module {
         %res = ruby.foo %0 : i32
 
         // CHECK: %{{.*}} = ruby.constant_int "1" : <"">
-        %3 = ruby.constant_int "1" : <"">
+        %1 = ruby.constant_int "1" : <"">
+        // Check: %{{.*}} = ruby.local_var_write "foo" = %1 : <"">
+        %2 = ruby.local_var_write "foo" = %1 : <""> -> <"">
+
 
         return
     }

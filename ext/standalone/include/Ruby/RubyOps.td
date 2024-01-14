@@ -12,6 +12,15 @@
 include "Ruby/RubyTypes.td"
 include "mlir/Interfaces/SideEffectInterfaces.td"
 
+def Ruby_LocalVariableWriteOp : Ruby_Op<"local_var_write", []> {
+    let arguments = (ins StrAttr:$var_name, Ruby_IntegerType:$input);
+    let results = (outs Ruby_IntegerType:$res);
+
+    let assemblyFormat = [{
+        $var_name `=` $input attr-dict `:` type($input) `->` type($res)
+    }];
+}
+
 def Ruby_ConstantIntOp : Ruby_Op<"constant_int", []> {
     let arguments = (ins StrAttr:$input);
     let results = (outs Ruby_IntegerType:$res);
