@@ -14,7 +14,7 @@ task default: %i[test rubocop]
 
 namespace :dialect do
   prefix = "/Users/johnlinvc/projs/ruby-mlir/llvm-project/build"
-  build_dir = "./ext/standalone/build"
+  build_dir = "./ext/mlir-ruby/build"
 
   desc "clean up build dir"
   task :clean do
