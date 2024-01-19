@@ -28,4 +28,11 @@ def RubyIseq_CustomType : RubyIseq_Type<"Custom", "custom"> {
     let assemblyFormat = "`<` $value `>`";
 }
 
+def RubyIseq_IntegerType : RubyIseq_Type<"Integer", "int"> {
+    let summary = "RubyIseq integer type";
+    let description = "Integer type in rubyiseq dialect";
+    let parameters = (ins StringRefParameter<"the integer value">:$value);
+    let assemblyFormat = "`<` $value `>`";
+}
+
 #endif // RUBYISEQ_TYPES

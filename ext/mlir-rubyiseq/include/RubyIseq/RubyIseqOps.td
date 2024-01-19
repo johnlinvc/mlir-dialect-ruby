@@ -13,6 +13,68 @@ include "RubyIseq/RubyIseqTypes.td"
 include "mlir/Interfaces/InferTypeOpInterface.td"
 include "mlir/Interfaces/SideEffectInterfaces.td"
 
+def RubyIseq_opt_plusOP : RubyIseq_Op<"opt_plus", []> {
+    let summary = "Add two integers.";
+    let description = [{
+        The `rubyiseq.opt_plus` operation adds two integers. It takes two
+        integers as arguments and returns an integer.
+
+        Example:
+
+        ```mlir
+        rubyiseq.opt_plus
+        ```
+    }];
+
+    let arguments = (ins);
+    let results = (outs);
+
+    let assemblyFormat = [{ attr-dict }];
+}
+
+def RubyIseq_leaveOP : RubyIseq_Op<"leave", []> {
+    let summary = "Leave the current control frame.";
+    let description = [{
+        The `rubyiseq.leave` operation leaves the current control frame. It
+        takes no arguments and returns no results.
+
+        Example:
+
+        ```mlir
+        // Leave the current control frame
+        %0 = rubyiseq.leave
+        ```
+    }];
+
+    let arguments = (ins);
+    let results = (outs);
+
+    let assemblyFormat = [{ attr-dict }];
+}
+
+def RubyIseq_putobjectOP : RubyIseq_Op<"putobject", []> {
+    let summary = "Put an object on the stack.";
+    let description = [{
+        The `rubyiseq.putobject` operation puts an object on the stack. It
+        takes an object as an argument and returns the object.
+
+        Example:
+
+        ```mlir
+        %0 = arith.constant 2 : i32
+        // Put the object %0 on the stack
+        %1 = rubyiseq.putobject %0 : i32
+        ```
+    }];
+
+    let arguments = (ins I32:$input);
+    let results = (outs I32:$res);
+
+    let assemblyFormat = [{
+        $input attr-dict `:` type($input)
+    }];
+}
+
 def RubyIseq_FooOp : RubyIseq_Op<"foo", [Pure,
                                              SameOperandsAndResultType]> {
     let summary = "Illustrates how to define an operation.";
