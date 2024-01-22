@@ -2,7 +2,7 @@
 # that we want to bundle together. Then we link a simple C executable
 # against it to demonstrate that it does have the fully self contained
 # core MLIR library and our own ruby dialect.
-add_mlir_aggregate(RubyCAPITestLib
+add_mlir_aggregate(RubyCAPILib
   SHARED
   EMBED_LIBS
   MLIRCAPIIR
@@ -17,4 +17,4 @@ add_llvm_executable(ruby-capi-test
 )
 llvm_update_compile_flags(ruby-capi-test)
 target_link_libraries(ruby-capi-test
-  PRIVATE RubyCAPITestLib)
+  PRIVATE RubyCAPILib)
