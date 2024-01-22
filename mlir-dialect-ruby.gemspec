@@ -4,7 +4,7 @@ require_relative "lib/mlir/dialect/ruby/version"
 
 Gem::Specification.new do |spec|
   spec.name = "mlir-dialect-ruby"
-  spec.version = Mlir::Dialect::Ruby::VERSION
+  spec.version = MLIR::Dialect::Ruby::VERSION
   spec.authors = ["johnlinvc"]
   spec.email = ["johnlinvc@gmail.com"]
 

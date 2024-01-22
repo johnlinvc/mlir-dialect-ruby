@@ -2,12 +2,14 @@
 
 require "test_helper"
 
-module Mlir
-  module Dialect
-    class TestRuby < Minitest::Test
-      def test_that_it_has_a_version_number
-        refute_nil ::Mlir::Dialect::Ruby::VERSION
-      end
-    end
+describe MLIR::Dialect::Ruby do
+  it "gets or loads dialect" do
+    context = MLIR::CAPI.mlirContextCreate
+    MLIR::CAPI.register_all_upstream_dialects(context)
+    MLIR::CAPI.mlirContextGetOrLoadDialect(context, MLIR::CAPI.mlirStringRefCreateFromCString("arith"))
+    MLIR::CAPI.mlirContextDestroy(context)
+  end
+  it "creates a dialect handle" do
+    MLIR::Dialect::Ruby::CAPI.mlirGetDialectHandle__ruby__
   end
 end
