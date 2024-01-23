@@ -1,6 +1,6 @@
 # frozen_string_literal: true
 
-require 'mlir'
+require "mlir"
 require_relative "ruby/version"
 require_relative "ruby/capi"
 
