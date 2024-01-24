@@ -64,7 +64,6 @@ namespace :dialect do
     system(cmd, chdir: build_dir)
   end
 
-  task test: %i[testruby testrubyiseq]
-
+  task test: %i[testruby testrubyiseq testrubyall]
 end
-task dialect: %i[dialect:configure dialect:build]
+task dialect: %i[dialect:configure dialect:build dialect:testrubyall]
