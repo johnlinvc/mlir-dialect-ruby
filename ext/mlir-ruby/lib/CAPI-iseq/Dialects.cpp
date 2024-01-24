@@ -6,10 +6,10 @@
 //
 //===----------------------------------------------------------------------===//
 
-#include "Ruby-c/Dialects.h"
+#include "RubyIseq-c/Dialects.h"
 
-#include "Ruby/RubyDialect.h"
+#include "RubyIseq/RubyIseqDialect.h"
 #include "mlir/CAPI/Registration.h"
 
-MLIR_DEFINE_CAPI_DIALECT_REGISTRATION(Ruby, ruby,
-                                      mlir::ruby::RubyDialect)
+MLIR_DEFINE_CAPI_DIALECT_REGISTRATION(RubyIseq, rubyiseq,
+                                      mlir::rubyiseq::RubyIseqDialect)

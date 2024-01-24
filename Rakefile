@@ -42,9 +42,24 @@ namespace :dialect do
 
   desc "build using cmake"
   task :build do
-    cmd = "cmake --build . --target check-ruby"
+    cmd = "cmake --build ."
     system(cmd, chdir: build_dir)
   end
+
+  desc "test ruby"
+  task :testruby do
+    cmd = "cmake --build .  --target check-ruby"
+    system(cmd, chdir: build_dir)
+  end
+
+  desc "test rubyiseq"
+  task :testrubyiseq do
+    cmd = "cmake --build .  --target check-rubyiseq"
+    system(cmd, chdir: build_dir)
+  end
+
+  task test: %i[testruby testrubyiseq]
+
 end
 task dialect: %i[dialect:configure dialect:build]
 

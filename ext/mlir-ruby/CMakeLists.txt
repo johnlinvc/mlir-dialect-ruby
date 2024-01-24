@@ -54,3 +54,8 @@ add_subdirectory(test)
 add_subdirectory(ruby-opt)
 add_subdirectory(ruby-plugin)
 add_subdirectory(ruby-translate)
+
+add_subdirectory(test-iseq)
+add_subdirectory(rubyiseq-opt)
+add_subdirectory(rubyiseq-plugin)
+add_subdirectory(rubyiseq-translate)
