@@ -58,6 +58,12 @@ namespace :dialect do
     system(cmd, chdir: build_dir)
   end
 
+  desc "test ruby all"
+  task :testrubyall do
+    cmd = "cmake --build .  --target check-ruby-all"
+    system(cmd, chdir: build_dir)
+  end
+
   task test: %i[testruby testrubyiseq]
 
 end
