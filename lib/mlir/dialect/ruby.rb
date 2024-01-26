@@ -3,6 +3,7 @@
 require "mlir"
 require_relative "ruby/version"
 require_relative "ruby/capi"
+require_relative "ruby/prism_loader"
 
 module MLIR
   module Dialect

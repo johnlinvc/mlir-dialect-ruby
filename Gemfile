@@ -5,6 +5,7 @@ source "https://rubygems.org"
 # Specify your gem's dependencies in mlir-dialect-ruby.gemspec
 gemspec
 
+gem "debug", "~> 1.9"
 gem "rake", "~> 13.0"
 
 gem "minitest", "~> 5.16"

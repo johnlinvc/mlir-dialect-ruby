@@ -3,6 +3,7 @@
 $LOAD_PATH.unshift File.expand_path("../lib", __dir__)
 ENV["MLIR_LIB_NAME"] = "RubyAllCAPILib"
 require "bundler/setup"
+require "debug"
 require "mlir"
 require "mlir/dialect/ruby"
 
