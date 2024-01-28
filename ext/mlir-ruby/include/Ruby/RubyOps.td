@@ -31,6 +31,15 @@ def Ruby_LocalVariableWriteOp : Ruby_Op<"local_variable_write", [SameOperandsAnd
     }];
 }
 
+def Ruby_ConstantStrOp : Ruby_Op<"constant_str", []> {
+    let arguments = (ins StrAttr:$input);
+    let results = (outs Ruby_StringType:$res);
+
+    let assemblyFormat = [{
+        $input attr-dict `:` type($res)
+    }];
+}
+
 def Ruby_ConstantIntOp : Ruby_Op<"constant_int", []> {
     let arguments = (ins StrAttr:$input);
     let results = (outs Ruby_IntegerType:$res);

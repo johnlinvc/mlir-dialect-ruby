@@ -28,6 +28,13 @@ def Ruby_CustomType : Ruby_Type<"Custom", "custom"> {
     let assemblyFormat = "`<` $value `>`";
 }
 
+def Ruby_StringType : Ruby_Type<"String", "string"> {
+    let summary = "Ruby string type";
+    let description = "String type in ruby dialect";
+    let parameters = (ins DefaultValuedParameter<"StringAttr", "$_builder.getStringAttr(\"\")">:$value);
+    let assemblyFormat = "(`<` $value^ `>`)?";
+}
+
 def Ruby_IntegerType : Ruby_Type<"Integer", "int"> {
     let summary = "Ruby integer type";
     let description = "Integer type in ruby dialect";
