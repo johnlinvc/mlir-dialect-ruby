@@ -52,9 +52,20 @@ module MLIR
           build_int_stmt(node.value)
         end
 
+        def visit_local_variable_write(node)
+          value = visit(node.value)
+          build_local_variable_write_stmt(node.name, value)
+        end
+
+        def visit_local_variable_read(node)
+          build_local_variable_read_stmt(node.name)
+        end
+
         def visit(node)
           type = node.type.to_s
-          method_name = "visit_#{type.split("_")[0]}"
+          method_name = "visit_#{type.split("_")[..-2].join("_")}"
+          raise "not implemented: #{method_name}" unless respond_to?(method_name)
+
           send(method_name, node)
         end
 
@@ -68,6 +79,18 @@ module MLIR
         def build_call_stmt(receiver, name, args)
           with_new_ssa_var do |ssa_var|
             @stmts << "  #{ssa_var} = ruby.call #{receiver}, \"#{name}\", #{args.join(", ")}"
+          end
+        end
+
+        def build_local_variable_write_stmt(name, value)
+          with_new_ssa_var do |ssa_var|
+            @stmts << "  #{ssa_var} = ruby.local_variable_write \"#{name}\", #{value}"
+          end
+        end
+
+        def build_local_variable_read_stmt(name)
+          with_new_ssa_var do |ssa_var|
+            @stmts << "  #{ssa_var} = ruby.local_variable_read \"#{name}\""
           end
         end
 
