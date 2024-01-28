@@ -42,4 +42,6 @@ def Ruby_IntegerType : Ruby_Type<"Integer", "int"> {
     let assemblyFormat = "(`<` $value^ `>`)?";
 }
 
+def Ruby_AnyType : AnyTypeOf<[Ruby_IntegerType, Ruby_StringType]>;
+
 #endif // RUBY_TYPES
