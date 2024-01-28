@@ -84,20 +84,20 @@ module MLIR
 
         def build_local_variable_write_stmt(name, value)
           with_new_ssa_var do |ssa_var|
-            @stmts << "  #{ssa_var} = ruby.local_variable_write \"#{name}\", #{value}"
+            @stmts << "  #{ssa_var} = ruby.local_variable_write \"#{name}\" = #{value} : !ruby.int -> !ruby.int"
           end
         end
 
         def build_local_variable_read_stmt(name)
           with_new_ssa_var do |ssa_var|
-            @stmts << "  #{ssa_var} = ruby.local_variable_read \"#{name}\""
+            @stmts << "  #{ssa_var} = ruby.local_variable_read \"#{name}\" : !ruby.int"
           end
         end
 
         def build_int_stmt(value)
           # MLIR::CAPI.mlirBuildIntLit(@context, MLIR::CAPI.mlirIntegerTypeGet(@context, 64), value)
           with_new_ssa_var do |ssa_var|
-            @stmts << "  #{ssa_var} = ruby.constant <\"#{value}\"> : i64"
+            @stmts << "  #{ssa_var} = ruby.constant_int <\"#{value}\"> : !ruby.int"
           end
         end
       end

@@ -9,8 +9,10 @@ module {
 
         // CHECK: %{{.*}} = ruby.constant_int "1" : !ruby.int
         %1 = ruby.constant_int "1" : !ruby.int
-        // Check: %{{.*}} = ruby.local_var_write "foo" = %1 : ruby.int -> ruby.int
-        %2 = ruby.local_var_write "foo" = %1 : !ruby.int -> !ruby.int
+        // Check: %{{.*}} = ruby.local_variable_write "foo" = %1 : ruby.int -> ruby.int
+        %2 = ruby.local_variable_write "foo" = %1 : !ruby.int -> !ruby.int
+        // Check: %{{.*}} = ruby.local_variable_read "bar" : ruby.int
+        %3 = ruby.local_variable_read "bar" : !ruby.int
 
 
         return

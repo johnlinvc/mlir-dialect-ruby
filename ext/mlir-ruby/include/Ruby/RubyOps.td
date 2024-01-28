@@ -12,7 +12,16 @@
 include "Ruby/RubyTypes.td"
 include "mlir/Interfaces/SideEffectInterfaces.td"
 
-def Ruby_LocalVariableWriteOp : Ruby_Op<"local_var_write", []> {
+def Ruby_LocalVariableReadOp : Ruby_Op<"local_variable_read", []> {
+    let arguments = (ins StrAttr:$var_name);
+    let results = (outs Ruby_IntegerType:$res);
+
+    let assemblyFormat = [{
+        $var_name attr-dict `:` type($res)
+    }];
+}
+
+def Ruby_LocalVariableWriteOp : Ruby_Op<"local_variable_write", []> {
     let arguments = (ins StrAttr:$var_name, Ruby_IntegerType:$input);
     let results = (outs Ruby_IntegerType:$res);
 
