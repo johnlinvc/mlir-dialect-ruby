@@ -2,6 +2,7 @@
 
 require "prism"
 require "mlir"
+require "erb"
 
 module MLIR
   module Dialect
@@ -9,6 +10,7 @@ module MLIR
       # A struct to hold SSA variable and its type
       SSARetValue = Struct.new(:ssa_var, :type)
 
+      # rubocop:disable Metrics/ClassLength
       # visit prism ast
       class PrismVisitor
         attr_reader :context, :stmts
@@ -35,7 +37,7 @@ module MLIR
         end
 
         def visit_call(node)
-          receiver = visit(node.receiver)
+          receiver = node.receiver ? visit(node.receiver) : nil
           name = node.name
           args = visit_arguments(node.arguments)
           build_call_stmt(receiver, name, args)
@@ -64,6 +66,10 @@ module MLIR
           build_local_variable_read_stmt(node.name)
         end
 
+        def visit_string(node)
+          build_string_stmt(node.unescaped)
+        end
+
         def visit(node)
           type = node.type.to_s
           method_name = "visit_#{type.split("_")[..-2].join("_")}"
@@ -81,15 +87,20 @@ module MLIR
           SSARetValue.new(ret, type)
         end
 
+        CALL_STMT_TPL_STR = <<~CALL_STMT_TPL.strip
+          <%= ssa_var %> = ruby.call <%= receiver_info %>\
+          -> "<%= name %>"(<%= args_ssa_values %>) \
+          : (<%= arg_types %>) -> <%= ret_type %>
+        CALL_STMT_TPL
+        CALL_STMT_TPL = ERB.new(CALL_STMT_TPL_STR)
+
         def build_call_stmt(receiver, name, args)
           with_new_ssa_var do |ssa_var|
-            stmt = "  #{ssa_var} = ruby.call #{receiver.ssa_var} -> \"#{name}\" "
+            receiver_info = receiver ? "#{receiver.ssa_var} : #{receiver.type} " : ""
             args_ssa_values = args.map(&:ssa_var).join(", ")
-            stmt += "(#{args_ssa_values})"
             arg_types = args.map(&:type).join(", ")
             ret_type = "!ruby.opaque_object"
-            stmt += " : #{receiver.type} -> (#{arg_types}) -> #{ret_type}"
-            @stmts << stmt
+            @stmts << CALL_STMT_TPL.result(binding)
             ret_type
           end
         end
@@ -117,6 +128,15 @@ module MLIR
             ret_type
           end
         end
+
+        def build_string_stmt(value)
+          with_new_ssa_var do |ssa_var|
+            ret_type = "!ruby.string"
+            @stmts << "  #{ssa_var} = ruby.constant_str \"#{value}\" : #{ret_type}"
+            ret_type
+          end
+        end
+        # rubocop:enable Metrics/ClassLength
       end
 
       # convert ruby code to mlir via prism

@@ -30,4 +30,10 @@ describe MLIR::Dialect::Ruby::PrismLoader do
     mod = loader.to_module
     parse_with_opt(mod)
   end
+
+  it "loads hello world" do
+    loader = MLIR::Dialect::Ruby::PrismLoader.new("puts 'hello world'")
+    mod = loader.to_module
+    parse_with_opt(mod)
+  end
 end
