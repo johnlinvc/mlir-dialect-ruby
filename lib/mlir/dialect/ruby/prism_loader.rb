@@ -6,6 +6,16 @@ require "mlir"
 module MLIR
   module Dialect
     module Ruby
+      # A struct to hold SSA variable and its type
+      class SSARetValue
+        attr_reader :ssa_var, :type
+
+        def initialize(ssa_var, type)
+          @ssa_var = ssa_var
+          @type = type
+        end
+      end
+
       # visit prism ast
       class PrismVisitor
         attr_reader :context, :stmts
@@ -71,39 +81,47 @@ module MLIR
 
         def with_new_ssa_var
           ret = "%#{@ssa_counter}"
-          yield ret if block_given?
+          raise "must have a block" unless block_given?
+
+          type = yield ret
           @ssa_counter += 1
-          ret
+          SSARetValue.new(ret, type)
         end
 
         def build_call_stmt(receiver, name, args)
           with_new_ssa_var do |ssa_var|
-            stmt = "  #{ssa_var} = ruby.call #{receiver} -> \"#{name}\" "
-            stmt += "(#{args.join(", ")})"
-            arg_types = args.map do
-              "!ruby.int"
-            end.join(", ")
-            stmt += " : !ruby.int -> (#{arg_types}) -> !ruby.int"
+            stmt = "  #{ssa_var} = ruby.call #{receiver.ssa_var} -> \"#{name}\" "
+            args_ssa_values = args.map(&:ssa_var).join(", ")
+            stmt += "(#{args_ssa_values})"
+            arg_types = args.map(&:type).join(", ")
+            ret_type = "!ruby.opaque_object"
+            stmt += " : #{receiver.type} -> (#{arg_types}) -> #{ret_type}"
             @stmts << stmt
+            ret_type
           end
         end
 
         def build_local_variable_write_stmt(name, value)
           with_new_ssa_var do |ssa_var|
-            @stmts << "  #{ssa_var} = ruby.local_variable_write \"#{name}\" = #{value} : !ruby.int "
+            @stmts << "  #{ssa_var} = ruby.local_variable_write \"#{name}\" = #{value.ssa_var} : #{value.type} "
+            value.type
           end
         end
 
         def build_local_variable_read_stmt(name)
           with_new_ssa_var do |ssa_var|
-            @stmts << "  #{ssa_var} = ruby.local_variable_read \"#{name}\" : !ruby.int"
+            ret_type = "!ruby.opaque_object"
+            @stmts << "  #{ssa_var} = ruby.local_variable_read \"#{name}\" : #{ret_type}"
+            ret_type
           end
         end
 
         def build_int_stmt(value)
           # MLIR::CAPI.mlirBuildIntLit(@context, MLIR::CAPI.mlirIntegerTypeGet(@context, 64), value)
           with_new_ssa_var do |ssa_var|
-            @stmts << "  #{ssa_var} = ruby.constant_int \"#{value}\" : !ruby.int"
+            ret_type = "!ruby.int"
+            @stmts << "  #{ssa_var} = ruby.constant_int \"#{value}\" : #{ret_type}"
+            ret_type
           end
         end
       end
