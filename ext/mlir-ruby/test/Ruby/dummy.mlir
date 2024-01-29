@@ -17,6 +17,10 @@ module {
 
         // Check: %{{.*}} = ruby.constant_str "bar" : ruby.string
         %4 = ruby.constant_str "1" : !ruby.string
+        
+        %5 = ruby.call %1 -> "+"() : !ruby.int -> () -> !ruby.int 
+        %6 = ruby.call %1 -> "+"(%1) : !ruby.int -> (!ruby.int) -> !ruby.int 
+        %7 = ruby.call %1 -> "+"(%1,%1) : !ruby.int -> (!ruby.int, !ruby.int) -> !ruby.int 
 
         return
     }

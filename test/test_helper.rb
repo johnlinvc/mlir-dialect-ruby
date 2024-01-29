@@ -8,3 +8,18 @@ require "mlir"
 require "mlir/dialect/ruby"
 
 require "minitest/autorun"
+require "english"
+
+module MLIRHelper
+  def parse_with_opt(stmts)
+    Tempfile.create("test") do |f|
+      f.write(stmts.join("\n"))
+      f.close
+      opt_cmd = File.expand_path("../ext/mlir-ruby/build/bin/ruby-opt", __dir__)
+      out = `#{opt_cmd} #{f.path}`
+      raise "opt failed: #{out}" unless $CHILD_STATUS.success?
+
+      out
+    end
+  end
+end

@@ -40,6 +40,15 @@ def Ruby_ConstantStrOp : Ruby_Op<"constant_str", []> {
     }];
 }
 
+def Ruby_CallOp : Ruby_Op<"call", []> {
+    let arguments = (ins Ruby_AnyType:$callee, StrAttr:$method_name, Variadic<Ruby_AnyType>:$args);
+    let results = (outs Ruby_AnyType:$res);
+
+    let assemblyFormat = [{
+        $callee `->` $method_name `(` ($args^)? `)` attr-dict `:` type($callee) `->` functional-type($args, $res)
+    }];
+}
+
 def Ruby_ConstantIntOp : Ruby_Op<"constant_int", []> {
     let arguments = (ins StrAttr:$input);
     let results = (outs Ruby_IntegerType:$res);

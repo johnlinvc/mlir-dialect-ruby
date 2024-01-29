@@ -78,13 +78,19 @@ module MLIR
 
         def build_call_stmt(receiver, name, args)
           with_new_ssa_var do |ssa_var|
-            @stmts << "  #{ssa_var} = ruby.call #{receiver}, \"#{name}\", #{args.join(", ")}"
+            stmt = "  #{ssa_var} = ruby.call #{receiver} -> \"#{name}\" "
+            stmt += "(#{args.join(", ")})"
+            arg_types = args.map do
+              "!ruby.int"
+            end.join(", ")
+            stmt += " : !ruby.int -> (#{arg_types}) -> !ruby.int"
+            @stmts << stmt
           end
         end
 
         def build_local_variable_write_stmt(name, value)
           with_new_ssa_var do |ssa_var|
-            @stmts << "  #{ssa_var} = ruby.local_variable_write \"#{name}\" = #{value} : !ruby.int -> !ruby.int"
+            @stmts << "  #{ssa_var} = ruby.local_variable_write \"#{name}\" = #{value} : !ruby.int "
           end
         end
 
@@ -97,7 +103,7 @@ module MLIR
         def build_int_stmt(value)
           # MLIR::CAPI.mlirBuildIntLit(@context, MLIR::CAPI.mlirIntegerTypeGet(@context, 64), value)
           with_new_ssa_var do |ssa_var|
-            @stmts << "  #{ssa_var} = ruby.constant_int <\"#{value}\"> : !ruby.int"
+            @stmts << "  #{ssa_var} = ruby.constant_int \"#{value}\" : !ruby.int"
           end
         end
       end
