@@ -42,6 +42,13 @@ def Ruby_IntegerType : Ruby_Type<"Integer", "int"> {
     let assemblyFormat = "(`<` $value^ `>`)?";
 }
 
-def Ruby_AnyType : AnyTypeOf<[Ruby_IntegerType, Ruby_StringType]>;
+def Ruby_OpaqueObjectType : Ruby_Type<"OpaqueObject", "opaque_object"> {
+    let summary = "Ruby opaque object type";
+    let description = "Opaque object type in ruby dialect";
+    let parameters = (ins DefaultValuedParameter<"StringAttr", "$_builder.getStringAttr(\"\")">:$value);
+    let assemblyFormat = "(`<` $value^ `>`)?";
+}
+
+def Ruby_AnyType : AnyTypeOf<[Ruby_IntegerType, Ruby_StringType, Ruby_OpaqueObjectType]>;
 
 #endif // RUBY_TYPES
