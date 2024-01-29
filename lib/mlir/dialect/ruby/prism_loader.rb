@@ -26,12 +26,12 @@ module MLIR
         end
 
         def visit_statements(node)
-          ret = []
+          ret = nil
           node.body.each do |stmt|
             # pp stmt
-            ret << visit(stmt)
+            ret = visit(stmt)
           end
-          ret[-1]
+          ret
         end
 
         def visit_call(node)
