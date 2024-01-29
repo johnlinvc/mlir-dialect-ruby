@@ -7,14 +7,7 @@ module MLIR
   module Dialect
     module Ruby
       # A struct to hold SSA variable and its type
-      class SSARetValue
-        attr_reader :ssa_var, :type
-
-        def initialize(ssa_var, type)
-          @ssa_var = ssa_var
-          @type = type
-        end
-      end
+      SSARetValue = Struct.new(:ssa_var, :type)
 
       # visit prism ast
       class PrismVisitor
