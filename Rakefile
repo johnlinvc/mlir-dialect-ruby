@@ -13,7 +13,8 @@ RuboCop::RakeTask.new
 task default: %i[test rubocop]
 
 namespace :dialect do
-  prefix = "/Users/johnlinvc/projs/ruby-mlir/llvm-project/build"
+  relative_prefix = File.expand_path("../llvm-project/build", __dir__)
+  prefix = ENV.fetch("MLIR_PREFIX", relative_prefix)
   build_dir = "./ext/mlir-ruby/build"
   cmake_vars = {
     "MLIR_DIR" => "#{prefix}../mlir/lib/cmake/mlir",
@@ -31,10 +32,9 @@ namespace :dialect do
   desc "configure using cmake"
   task :configure do
     FileUtils.mkdir_p build_dir
-    ENV["LDFLAGS"] = "-L/opt/homebrew/opt/llvm/lib"
-    ENV["CPPFLAGS"] = "-I/opt/homebrew/opt/llvm/include"
+    ENV["LDFLAGS"] ||= "-L/opt/homebrew/opt/llvm/lib"
+    ENV["CPPFLAGS"] ||= "-I/opt/homebrew/opt/llvm/include"
     ENV["PATH"] = "/opt/homebrew/opt/llvm/bin:#{ENV.fetch("PATH", nil)}"
-    system("env")
     cmake_vars_str = cmake_vars.map { |k, v| "-D#{k}=#{v}" }.join(" ")
     cmd = "cmake -G 'Unix Makefiles' .. #{cmake_vars_str}}"
     system(cmd, chdir: build_dir)

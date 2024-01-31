@@ -1,6 +1,6 @@
 # Current Goals
-- [ ] parse Ruby code with prism
-- [ ] Define ruby dialect
+- [x] parse Ruby code with prism
+- [x] Define ruby dialect
 - [ ] convert prism AST into ruby dialect
 - [ ] Create a YARV iseq MLIR target
 - [ ] Define a YARV dialect
