@@ -4,14 +4,13 @@ A MLIR dialect for Ruby
 
 ## Installation
 
-### _warning_ 
-Need to compile the FFI lib manually currently. Doesn't support install via Ruby gem currently.
+### __WARNING__
+Need to compile the FFI lib manually currently. Doesn't support install via Ruby gem currently. Only tested on __macOS__ currently.
 
 1. Compile MLIR, see https://mlir.llvm.org/getting_started/
 2. Clone this repo aloneside with the `llvm-project` dir.
 3. `cd mlir-dialect-ruby`
 4. `rake dialect`
-5. `ln -s ext/mlir-ruby/build/lib/libRubyAllCAPILib.dylib libRubyAllCAPILib.dylib`
 6. `rake`
 
 ## Usage

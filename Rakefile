@@ -62,6 +62,8 @@ namespace :dialect do
   task :testrubyall do
     cmd = "cmake --build .  --target check-ruby-all"
     system(cmd, chdir: build_dir)
+    system("ln -s #{build_dir}/lib/libRubyAllCAPILib.dylib libRubyAllCAPILib.dylib")
+    system("ln -s #{build_dir}/lib/libRubyAllCAPILib.so libRubyAllCAPILib.so")
   end
 
   task test: %i[testruby testrubyiseq testrubyall]
