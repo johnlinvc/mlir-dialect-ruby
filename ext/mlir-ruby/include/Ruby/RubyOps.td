@@ -58,6 +58,13 @@ def Ruby_ConstantIntOp : Ruby_Op<"constant_int", []> {
     }];
 }
 
+def Ruby_ReturnOp : Ruby_Op<"return", [Terminator]> {
+    let arguments = (ins Optional<Ruby_AnyType>:$input);
+    let assemblyFormat = [{
+        attr-dict ($input^ `:` type($input))?
+    }];
+}
+
 def Ruby_DefOp : Ruby_Op<"def", []> {
     let arguments = (ins StrAttr:$method_name, Optional<Ruby_AnyType>:$receiver ,
      OptionalAttr<StrArrayAttr>:$required_args, 
