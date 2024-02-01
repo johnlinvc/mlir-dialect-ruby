@@ -26,6 +26,14 @@ module {
 
         return
     }
+    
+
+    ruby.def "hello"(args: ["name"]) : (args: [!ruby.string]) -> !ruby.string {
+    } : !ruby.sym
+
+    %str.0 = ruby.constant_str "hello" : !ruby.string
+    ruby.def "str_hello"+(%str.0: !ruby.string)(args:["name"]) : (args: [!ruby.string]) -> !ruby.string {
+    } : !ruby.sym
 
 
     // CHECK-LABEL: func @ruby_types(%arg0: !ruby.custom<"10">, %arg1: !ruby.int<"10">)

@@ -58,6 +58,22 @@ def Ruby_ConstantIntOp : Ruby_Op<"constant_int", []> {
     }];
 }
 
+def Ruby_DefOp : Ruby_Op<"def", []> {
+    let arguments = (ins StrAttr:$method_name, Optional<Ruby_AnyType>:$receiver ,
+     StrArrayAttr:$args, 
+     TypeArrayAttr:$arg_types,
+     TypeAttr:$ret_type
+     );
+    let regions = (region AnyRegion:$body);
+    let results = (outs Ruby_SymbolType:$res);
+
+    let assemblyFormat = [{
+        $method_name (`+``(`$receiver^ `:` type($receiver)`)`)? 
+        `(` `args``:` $args `)` attr-dict `:` `(` `args``:`$arg_types `)` `->` $ret_type 
+        $body `:` type($res)
+    }];
+}
+
 def Ruby_FooOp : Ruby_Op<"foo", [Pure]> {
     let summary = "Illustrates how to define an operation.";
     let description = [{
