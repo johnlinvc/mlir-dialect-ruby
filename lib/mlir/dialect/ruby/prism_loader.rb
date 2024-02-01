@@ -18,6 +18,7 @@ module MLIR
         def initialize(context = nil)
           @context = context || MLIR::CAPI.mlirContextCreate
           @ssa_counter = 0
+          @ssa_prefixes = []
           @stmts = []
           MLIR::CAPI.register_all_upstream_dialects(@context)
           MLIR::CAPI.mlirDialectHandleRegisterDialect(MLIR::Dialect::Ruby::CAPI.mlirGetDialectHandle__ruby__, @context)
@@ -70,6 +71,20 @@ module MLIR
           build_string_stmt(node.unescaped)
         end
 
+        def visit_parameters(node)
+          {
+            requireds: node.requireds&.map(&:name)
+          }
+        end
+
+        def visit_def(node)
+          receiver = node.receiver ? visit(node.receiver) : nil
+          parameters = visit_parameters(node.parameters)
+          build_def_stmt(node.name, receiver, parameters) do
+            visit_statements(node.body)
+          end
+        end
+
         def visit(node)
           type = node.type.to_s
           method_name = "visit_#{type.split("_")[..-2].join("_")}"
@@ -78,8 +93,22 @@ module MLIR
           send(method_name, node)
         end
 
+        def ssa_prefix
+          @ssa_prefixes.map { "#{_1}." }.join
+        end
+
+        def with_ssa_prefix(prefix)
+          raise "must have a block" unless block_given?
+
+          @ssa_prefixes << prefix
+          currnt_counter = @ssa_counter
+          yield
+          @ssa_counter = currnt_counter
+          @ssa_prefixes.pop
+        end
+
         def with_new_ssa_var
-          ret = "%#{@ssa_counter}"
+          ret = "%#{ssa_prefix}#{@ssa_counter}"
           raise "must have a block" unless block_given?
 
           type = yield ret
@@ -136,6 +165,41 @@ module MLIR
             ret_type
           end
         end
+
+        def build_def_stmt(name, receiver, parameters)
+          with_new_ssa_var do |def_var|
+            stmt = "#{def_var} = ruby.def \"#{name}\""
+            stmt += "+(#{receiver.ssa_var} : #{receiver.type})" if receiver
+            params = "("
+            if parameters[:requireds]
+              params += "required_args: [#{parameters[:requireds].map do
+                                             "\"#{_1}\""
+                                           end.join(",")}]"
+            end
+            params += ")"
+            stmt += params
+            stmt += ":"
+            param_types = "("
+            if parameters[:requireds]
+              param_types += "required_args: [#{parameters[:requireds].map do
+                                                  "!ruby.opaque_object"
+                                                end.join(",")}]"
+            end
+            param_types += ")"
+            stmt += param_types
+            stmt += " -> !ruby.opaque_object"
+            @stmts << stmt
+            @stmts << "{"
+            with_ssa_prefix("name") do
+              value = yield
+              stmts << "  ruby.return #{value.ssa_var} : #{value.type}" if stmts.last !~ /\A\s*ruby.return/
+            end
+            ret_type = "!ruby.sym"
+            @stmts << "} : #{ret_type}"
+            ret_type
+          end
+        end
+
         # rubocop:enable Metrics/ClassLength
       end
 
