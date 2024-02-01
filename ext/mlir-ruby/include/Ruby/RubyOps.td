@@ -60,8 +60,8 @@ def Ruby_ConstantIntOp : Ruby_Op<"constant_int", []> {
 
 def Ruby_DefOp : Ruby_Op<"def", []> {
     let arguments = (ins StrAttr:$method_name, Optional<Ruby_AnyType>:$receiver ,
-     StrArrayAttr:$args, 
-     TypeArrayAttr:$arg_types,
+     OptionalAttr<StrArrayAttr>:$required_args, 
+     OptionalAttr<TypeArrayAttr>:$required_arg_types,
      TypeAttr:$ret_type
      );
     let regions = (region AnyRegion:$body);
@@ -69,7 +69,11 @@ def Ruby_DefOp : Ruby_Op<"def", []> {
 
     let assemblyFormat = [{
         $method_name (`+``(`$receiver^ `:` type($receiver)`)`)? 
-        `(` `args``:` $args `)` attr-dict `:` `(` `args``:`$arg_types `)` `->` $ret_type 
+        `(`
+            (`required_args` `:` $required_args^)?
+        `)` attr-dict `:` `(` 
+            (`required_args``:`$required_arg_types^)?
+        `)` `->` $ret_type 
         $body `:` type($res)
     }];
 }

@@ -27,12 +27,14 @@ module {
         return
     }
     
+    ruby.def "no_arg"():() -> !ruby.string {
+    } : !ruby.sym
 
-    ruby.def "hello"(args: ["name"]) : (args: [!ruby.string]) -> !ruby.string {
+    ruby.def "hello"(required_args: ["name"]) : (required_args: [!ruby.string]) -> !ruby.string {
     } : !ruby.sym
 
     %str.0 = ruby.constant_str "hello" : !ruby.string
-    ruby.def "str_hello"+(%str.0: !ruby.string)(args:["name"]) : (args: [!ruby.string]) -> !ruby.string {
+    ruby.def "str_hello"+(%str.0: !ruby.string)(required_args:["name"]) : (required_args: [!ruby.string]) -> !ruby.string {
     } : !ruby.sym
 
 
