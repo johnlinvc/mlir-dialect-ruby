@@ -40,7 +40,6 @@ describe MLIR::Dialect::Ruby::PrismLoader do
   it "load define method with normal args" do
     loader = MLIR::Dialect::Ruby::PrismLoader.new("def hello(name)\nname\nend")
     mod = loader.to_module
-    puts mod.join("\n")
     parse_with_opt(mod)
   end
 end

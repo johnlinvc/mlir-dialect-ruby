@@ -166,37 +166,61 @@ module MLIR
           end
         end
 
+        def build_def_stmt_params(parameters)
+          params = "("
+          if parameters[:requireds]
+            requireds = parameters[:requireds].map do |arg|
+              "\"#{arg}\""
+            end.join(",")
+            params += "required_args: [#{requireds}]"
+          end
+          params += ")"
+          params
+        end
+
+        def build_def_stmt_param_types(parameters)
+          param_types = "("
+          if parameters[:requireds]
+            param_types += "required_args: [#{parameters[:requireds].map do
+                                                "!ruby.opaque_object"
+                                              end.join(",")}]"
+          end
+          param_types += ")"
+          param_types
+        end
+
+        DEF_STMT_TPL_STR = <<~DEF_STMT_TPL.strip
+          <%= def_var %> = ruby.def "<%= name %>"<%= receiver_part %> <%= params_part %> \
+          : \
+          <%= param_types_part %> -> !ruby.opaque_object
+        DEF_STMT_TPL
+        DEF_STMT_TPL = ERB.new(DEF_STMT_TPL_STR)
+
+        def build_def_stmt_front_part(name, receiver, parameters, def_var)
+          receiver_part = receiver ? "+(#{receiver.ssa_var} : #{receiver.type})" : ""
+          params_part = build_def_stmt_params(parameters)
+          param_types_part = build_def_stmt_param_types(parameters)
+          stmt = DEF_STMT_TPL.result(binding)
+          @stmts << stmt
+        end
+
+        def build_def_stmt_region_part
+          @stmts << "{"
+          yield
+          ret_type = "!ruby.sym"
+          @stmts << "} : #{ret_type}"
+          ret_type
+        end
+
         def build_def_stmt(name, receiver, parameters)
           with_new_ssa_var do |def_var|
-            stmt = "#{def_var} = ruby.def \"#{name}\""
-            stmt += "+(#{receiver.ssa_var} : #{receiver.type})" if receiver
-            params = "("
-            if parameters[:requireds]
-              params += "required_args: [#{parameters[:requireds].map do
-                                             "\"#{_1}\""
-                                           end.join(",")}]"
+            build_def_stmt_front_part(name, receiver, parameters, def_var)
+            build_def_stmt_region_part do
+              with_ssa_prefix(name) do
+                value = yield
+                stmts << "  ruby.return #{value.ssa_var} : #{value.type}" if stmts.last !~ /\A\s*ruby.return/
+              end
             end
-            params += ")"
-            stmt += params
-            stmt += ":"
-            param_types = "("
-            if parameters[:requireds]
-              param_types += "required_args: [#{parameters[:requireds].map do
-                                                  "!ruby.opaque_object"
-                                                end.join(",")}]"
-            end
-            param_types += ")"
-            stmt += param_types
-            stmt += " -> !ruby.opaque_object"
-            @stmts << stmt
-            @stmts << "{"
-            with_ssa_prefix("name") do
-              value = yield
-              stmts << "  ruby.return #{value.ssa_var} : #{value.type}" if stmts.last !~ /\A\s*ruby.return/
-            end
-            ret_type = "!ruby.sym"
-            @stmts << "} : #{ret_type}"
-            ret_type
           end
         end
 
