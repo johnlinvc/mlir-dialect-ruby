@@ -31,8 +31,10 @@ def RubyIseq_CustomType : RubyIseq_Type<"Custom", "custom"> {
 def RubyIseq_IntegerType : RubyIseq_Type<"Integer", "int"> {
     let summary = "RubyIseq integer type";
     let description = "Integer type in rubyiseq dialect";
-    let parameters = (ins StringRefParameter<"the integer value">:$value);
+    let parameters = (ins DefaultValuedParameter<"StringAttr", "$_builder.getStringAttr(\"0\")">:$value);
     let assemblyFormat = "`<` $value `>`";
 }
+
+def RubyIseq_AnyType : AnyTypeOf<[RubyIseq_IntegerType]>;
 
 #endif // RUBYISEQ_TYPES

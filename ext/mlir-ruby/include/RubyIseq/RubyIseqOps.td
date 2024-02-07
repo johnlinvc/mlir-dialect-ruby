@@ -67,11 +67,11 @@ def RubyIseq_putobjectOP : RubyIseq_Op<"putobject", []> {
         ```
     }];
 
-    let arguments = (ins I32:$input);
-    let results = (outs I32:$res);
+    let arguments = (ins RubyIseq_AnyType:$input);
+    let results = (outs);
 
     let assemblyFormat = [{
-        $input attr-dict `:` type($input)
+        $input `:` type($input) attr-dict 
     }];
 }
 
