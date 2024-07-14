@@ -32,6 +32,7 @@ def RubyIseq_opt_plusOP : RubyIseq_Op<"opt_plus", []> {
     let assemblyFormat = [{ attr-dict }];
 }
 
+
 def RubyIseq_leaveOP : RubyIseq_Op<"leave", []> {
     let summary = "Leave the current control frame.";
     let description = [{
@@ -96,6 +97,31 @@ def RubyIseq_FooOp : RubyIseq_Op<"foo", [Pure,
 
     let arguments = (ins I32:$input);
     let results = (outs I32:$res);
+
+    let assemblyFormat = [{
+        $input attr-dict `:` type($input)
+    }];
+}
+
+// Below are intermediate Op for lowering from the Ruby Dialect.
+// Will be elimated after canicoalization.
+
+def RubyIseq_PopRefOp : RubyIseq_Op<"pop_ref", []> {
+    let summary = "Pop a reference from the stack.";
+    let description = [{
+        The `rubyiseq.pop_ref` operation pops a reference from the stack. It
+        takes the var to be poped.
+
+        Example:
+
+        ```mlir
+        // Pop a reference from the stack
+        %1 = rubyiseq.pop_ref %0
+        ```
+    }];
+
+    let arguments = (ins RubyIseq_AnyType:$input);
+    let results = (outs);
 
     let assemblyFormat = [{
         $input attr-dict `:` type($input)

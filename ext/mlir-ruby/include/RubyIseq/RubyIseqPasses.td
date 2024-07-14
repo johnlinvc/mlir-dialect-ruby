@@ -27,4 +27,11 @@ def RubyIseqSwitchBarFoo: Pass<"rubyiseq-switch-bar-foo", "::mlir::ModuleOp"> {
   }];
 }
 
+def RubyIseqLowerFromRuby: Pass<"rubyiseq-lower-from-ruby", "::mlir::ModuleOp"> {
+  let summary = "Lowers a RubyIseq dialect module to the LLVM dialect.";
+  let description = [{
+    Lowers a RubyIseq dialect module to the LLVM dialect.
+  }];
+}
+
 #endif // RUBYISEQ_PASS
