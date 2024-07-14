@@ -16,3 +16,4 @@ add_mlir_dialect_library(MLIRRuby
         MLIRInferTypeOpInterface
         MLIRFuncDialect
         )
+add_subdirectory(Target)
