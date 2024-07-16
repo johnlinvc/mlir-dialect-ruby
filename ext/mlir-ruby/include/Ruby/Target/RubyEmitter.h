@@ -7,10 +7,10 @@
 #include "llvm/Support/raw_ostream.h"
 
 namespace mlir {
-namespace ruby {
-    LogicalResult translateToRuby(Operation *op, raw_ostream &os);
-} // namespace ruby
+    void registerToRubyTranslation();
+    namespace ruby {
+        LogicalResult translateToRuby(Operation *op, raw_ostream &os);
+    } // namespace ruby
 } // namespace mlir
-
 
 #endif // MLIR_RUBY_TARGET_RUBY_EMITTER_H

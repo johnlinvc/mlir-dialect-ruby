@@ -3,9 +3,10 @@
 #include "Ruby/RubyDialect.h"
 
 using namespace mlir;
+namespace mlir {
 void registerToRubyTranslation(){
       TranslateFromMLIRRegistration reg(
-      "mlir-to-cpp", "translate from mlir to cpp",
+      "mlir-to-ruby", "translate from mlir to Ruby",
       [](Operation *op, raw_ostream &output) {
         return ruby::translateToRuby(
             op, output);
@@ -16,3 +17,4 @@ void registerToRubyTranslation(){
         // clang-format on
       });
 }
+} // namespace mlir

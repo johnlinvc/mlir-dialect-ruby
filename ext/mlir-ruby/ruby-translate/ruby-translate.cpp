@@ -19,9 +19,11 @@
 #include "mlir/Tools/mlir-translate/MlirTranslateMain.h"
 #include "mlir/Tools/mlir-translate/Translation.h"
 #include "llvm/Support/raw_ostream.h"
+#include "Ruby/Target/RubyEmitter.h"
 
 int main(int argc, char **argv) {
   mlir::registerAllTranslations();
+  mlir::registerToRubyTranslation();
 
   // TODO: Register ruby translations here.
   mlir::TranslateFromMLIRRegistration withdescription(
