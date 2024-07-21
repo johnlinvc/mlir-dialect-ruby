@@ -49,6 +49,23 @@ def Ruby_CallOp : Ruby_Op<"call", [AttrSizedOperandSegments]> {
     }];
 }
 
+class Ruby_BinaryOp<string mnemonic> : Ruby_Op<mnemonic, [Pure]> {
+    let arguments = (ins Ruby_AnyType:$lhs, Ruby_AnyType:$rhs);
+    let results = (outs Ruby_AnyType:$res);
+
+    let assemblyFormat = [{
+        $lhs `,` $rhs attr-dict `:` `(` type($lhs) `,` type($rhs) `)` `->` type($res) 
+    }];
+}
+
+def Ruby_AddOp : Ruby_BinaryOp<"add"> {
+    let summary = "Add two objects";
+    let description = [{
+        This operation adds two objects.
+    }];
+    let hasFolder = 1;
+}
+
 def Ruby_ConstantIntOp : Ruby_Op<"constant_int", []> {
     let arguments = (ins StrAttr:$input);
     let results = (outs Ruby_IntegerType:$res);
@@ -56,6 +73,7 @@ def Ruby_ConstantIntOp : Ruby_Op<"constant_int", []> {
     let assemblyFormat = [{
         $input attr-dict `:` type($res)
     }];
+    let hasFolder = 1;
 }
 
 def Ruby_ReturnOp : Ruby_Op<"return", [Terminator]> {

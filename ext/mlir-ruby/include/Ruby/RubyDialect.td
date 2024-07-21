@@ -25,6 +25,7 @@ def Ruby_Dialect : Dialect {
     }];
     let cppNamespace = "::mlir::ruby";
 
+    let hasConstantMaterializer = 1;
     let useDefaultTypePrinterParser = 1;
     let extraClassDeclaration = [{
         void registerTypes();

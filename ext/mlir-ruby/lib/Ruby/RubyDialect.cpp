@@ -9,6 +9,7 @@
 #include "Ruby/RubyDialect.h"
 #include "Ruby/RubyOps.h"
 #include "Ruby/RubyTypes.h"
+#include "llvm/ADT/TypeSwitch.h"
 
 using namespace mlir;
 using namespace mlir::ruby;
@@ -25,4 +26,24 @@ void RubyDialect::initialize() {
 #include "Ruby/RubyOps.cpp.inc"
       >();
   registerTypes();
+}
+
+/// Hook to materialize a single constant operation from a given attribute value
+/// with the desired resultant type. This method should use the provided builder
+/// to create the operation without changing the insertion position. The
+/// generated operation is expected to be constant-like. On success, this hook
+/// should return the value generated to represent the constant value.
+/// Otherwise, it should return nullptr on failure.
+Operation *RubyDialect::materializeConstant(OpBuilder &builder, Attribute value,
+                                          Type type, Location loc) {
+  Operation * result =
+      llvm::TypeSwitch<Type, Operation *>(type)
+          .Case<IntegerType>([&](auto type)
+                          { 
+                            auto strAttr = value.dyn_cast<StringAttr>();
+                            return strAttr ? builder.create<ConstantIntOp>(loc, type, strAttr) : nullptr; 
+                          })
+          .Default([&](auto type)
+                          { return nullptr; });
+  return result;
 }

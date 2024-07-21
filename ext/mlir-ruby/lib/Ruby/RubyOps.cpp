@@ -8,6 +8,24 @@
 
 #include "Ruby/RubyOps.h"
 #include "Ruby/RubyDialect.h"
+#include "mlir/Dialect/CommonFolders.h"
 
 #define GET_OP_CLASSES
 #include "Ruby/RubyOps.cpp.inc"
+
+namespace mlir {
+    namespace ruby
+    {
+        OpFoldResult ConstantIntOp::fold(ConstantIntOp::FoldAdaptor adaptor) {
+            return Value();
+        }
+        OpFoldResult AddOp::fold(AddOp::FoldAdaptor adaptor){
+            auto operands = adaptor.getOperands();
+            return operands[0];
+        }
+
+    
+
+        // }
+    } // namespace ruby
+} // namespace mlir
