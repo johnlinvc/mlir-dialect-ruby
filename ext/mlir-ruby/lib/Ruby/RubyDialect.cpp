@@ -41,11 +41,7 @@ Operation *RubyDialect::materializeConstant(OpBuilder &builder, Attribute value,
       llvm::TypeSwitch<Type, Operation *>(type)
           .Case<IntegerType>([&](auto type)
                           { 
-                            llvm::dbgs() << "materializeConstant: IntegerType\n";
                             auto strAttr = value.dyn_cast<StringAttr>();
-                            if (!strAttr) {
-                              llvm::dbgs() << "strAttr is null\n";
-                            }
                             return strAttr ? builder.create<ConstantIntOp>(loc, type, strAttr) : nullptr; 
                           })
           .Default([&](auto type)
