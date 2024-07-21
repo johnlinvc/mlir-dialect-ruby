@@ -66,7 +66,7 @@ def Ruby_AddOp : Ruby_BinaryOp<"add"> {
     let hasFolder = 1;
 }
 
-def Ruby_ConstantIntOp : Ruby_Op<"constant_int", []> {
+def Ruby_ConstantIntOp : Ruby_Op<"constant_int", [Pure, ConstantLike]> {
     let arguments = (ins StrAttr:$input);
     let results = (outs Ruby_IntegerType:$res);
 
