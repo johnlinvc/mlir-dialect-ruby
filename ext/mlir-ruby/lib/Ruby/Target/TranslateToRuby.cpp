@@ -23,6 +23,9 @@ namespace {
 }
 
 static LogicalResult printOperation(RubyEmitter &emitter, ruby::ConstantIntOp op) {
+  if (!op->getAttrDictionary().get("rb_literal")) {
+    return success();
+  }
   Attribute value = op.getInputAttr();
   raw_ostream &os = emitter.ostream();
   if (auto sAttr = dyn_cast<StringAttr>(value)) {
@@ -53,6 +56,8 @@ LogicalResult RubyEmitter::emitOperation(Operation &op) {
                           { return printOperation(*this, op); })
           .Case<ruby::ConstantIntOp>([&](auto op)
                                   { return printOperation(*this, op); })
+          // .Case<ruby::AddOp>([&](auto op)
+          //                         { return printOperation(*this, op); })
           .Default([&](Operation *)
                    { return op.emitOpError("unable to find printer for op"); });
   if (failed(status))
