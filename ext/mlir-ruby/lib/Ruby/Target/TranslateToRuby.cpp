@@ -23,7 +23,7 @@ namespace {
 }
 
 static LogicalResult printOperation(RubyEmitter &emitter, ruby::ConstantIntOp op) {
-  if (!op->getAttrDictionary().get("rb_literal")) {
+  if (!op->getAttrDictionary().get("rb_stmt")) {
     return success();
   }
   Attribute value = op.getInputAttr();
