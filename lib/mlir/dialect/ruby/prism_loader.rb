@@ -13,13 +13,14 @@ module MLIR
       # rubocop:disable Metrics/ClassLength
       # visit prism ast
       class PrismVisitor
-        attr_reader :context, :stmts
+        attr_reader :context, :stmts, :attr_queue
 
         def initialize(context = nil)
           @context = context || MLIR::CAPI.mlirContextCreate
           @ssa_counter = 0
           @ssa_prefixes = []
           @stmts = []
+          @attr_queue = []
           MLIR::CAPI.register_all_upstream_dialects(@context)
           MLIR::CAPI.mlirDialectHandleRegisterDialect(MLIR::Dialect::Ruby::CAPI.mlirGetDialectHandle__ruby__, @context)
         end
@@ -32,6 +33,7 @@ module MLIR
           ret = nil
           node.body.each do |stmt|
             # pp stmt
+            attr_queue << { "rb_stmt" => true }
             ret = visit(stmt)
           end
           ret
@@ -93,6 +95,8 @@ module MLIR
           send(method_name, node)
         end
 
+        # Utility methods
+
         def ssa_prefix
           @ssa_prefixes.map { "#{_1}." }.join
         end
@@ -107,6 +111,18 @@ module MLIR
           @ssa_prefixes.pop
         end
 
+        def pop_gen_attr_dict
+          attr_dict = attr_queue.pop
+          return "" unless attr_dict
+          res = "{"
+          body_pairs = attr_dict.each.map do |key, value|
+            "#{key} = #{value.inspect}"
+          end
+          res += body_pairs.join(", ")
+          res += "}"
+          res
+        end
+
         def with_new_ssa_var
           ret = "%#{ssa_prefix}#{@ssa_counter}"
           raise "must have a block" unless block_given?
@@ -115,6 +131,8 @@ module MLIR
           @ssa_counter += 1
           SSARetValue.new(ret, type)
         end
+
+        # Build MLIR statements
 
         CALL_STMT_TPL_STR = <<~CALL_STMT_TPL.strip
           <%= ssa_var %> = ruby.call <%= receiver_info %>\
@@ -136,7 +154,7 @@ module MLIR
 
         def build_local_variable_write_stmt(name, value)
           with_new_ssa_var do |ssa_var|
-            @stmts << "  #{ssa_var} = ruby.local_variable_write \"#{name}\" = #{value.ssa_var} : #{value.type} "
+            @stmts << "  #{ssa_var} = ruby.local_variable_write \"#{name}\" = #{value.ssa_var} #{pop_gen_attr_dict}: #{value.type} "
             value.type
           end
         end
@@ -153,7 +171,7 @@ module MLIR
           # MLIR::CAPI.mlirBuildIntLit(@context, MLIR::CAPI.mlirIntegerTypeGet(@context, 64), value)
           with_new_ssa_var do |ssa_var|
             ret_type = "!ruby.int"
-            @stmts << "  #{ssa_var} = ruby.constant_int \"#{value}\" : #{ret_type}"
+            @stmts << "  #{ssa_var} = ruby.constant_int \"#{value}\" #{pop_gen_attr_dict} : #{ret_type}"
             ret_type
           end
         end
@@ -161,7 +179,7 @@ module MLIR
         def build_string_stmt(value)
           with_new_ssa_var do |ssa_var|
             ret_type = "!ruby.string"
-            @stmts << "  #{ssa_var} = ruby.constant_str \"#{value}\" : #{ret_type}"
+            @stmts << "  #{ssa_var} = ruby.constant_str \"#{value}\" #{pop_gen_attr_dict} : #{ret_type}"
             ret_type
           end
         end
