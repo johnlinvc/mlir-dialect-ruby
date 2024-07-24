@@ -66,6 +66,7 @@ module MLIR
         end
 
         def visit_local_variable_write(node)
+          attr_queue << {}
           value = visit(node.value)
           build_local_variable_write_stmt(node.name, value)
         end
@@ -132,8 +133,9 @@ module MLIR
         def with_new_ssa_var
           ret = "%#{ssa_prefix}#{@ssa_counter}"
           raise "must have a block" unless block_given?
+
           attr_dict = pop_gen_attr_dict
-          type = yield ret,attr_dict
+          type = yield ret, attr_dict
           @ssa_counter += 1
           SSARetValue.new(ret, type)
         end
@@ -163,10 +165,9 @@ module MLIR
         CALL_STMT_TPL = ERB.new(CALL_STMT_TPL_STR)
 
         def build_call_stmt(receiver, name, args)
-          plus_optimize = name == :'+' && receiver && args.size == 1
-          if plus_optimize
-            return build_plus_stmt(receiver, args[0])
-          end
+          plus_optimize = name == :+ && receiver && args.size == 1
+          return build_plus_stmt(receiver, args[0]) if plus_optimize
+
           with_new_ssa_var do |ssa_var|
             receiver_info = receiver ? "#{receiver.ssa_var} : #{receiver.type} " : ""
             args_ssa_values = args.map(&:ssa_var).join(", ")

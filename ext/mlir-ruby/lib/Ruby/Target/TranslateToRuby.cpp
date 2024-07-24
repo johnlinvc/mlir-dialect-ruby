@@ -24,6 +24,29 @@ namespace {
   };
 }
 
+static LogicalResult printOperation(RubyEmitter &emitter, ruby::LocalVariableWriteOp op, bool skipStmtCheck = false) {
+  if (!op->getAttrDictionary().get("rb_stmt")) {
+    if (!skipStmtCheck) {
+      return success();
+    }
+  }
+  Attribute value = op.getVarNameAttr();
+  raw_ostream &os = emitter.ostream();
+  if(!isa<StringAttr>(value)) {
+    return failure();
+  }
+  if (auto sAttr = dyn_cast<StringAttr>(value)) {
+    os << sAttr.getValue().str();
+  }
+  os << " = ";
+  if( failed(emitter.emitOperand(op.getInput())) )
+    return failure();
+  if (op->getAttrDictionary().get("rb_stmt")) {
+    os << "\n";
+  }
+  return success();
+}
+
 static LogicalResult printOperation(RubyEmitter &emitter, ruby::AddOp op, bool skipStmtCheck = false) {
   if (!op->getAttrDictionary().get("rb_stmt")) {
     if (!skipStmtCheck) {
@@ -91,6 +114,8 @@ LogicalResult RubyEmitter::emitOperation(Operation &op, bool skipStmtCheck/*=fal
           .Case<ruby::ConstantIntOp>([&](auto op)
                                   { return printOperation(*this, op, skipStmtCheck); })
           .Case<ruby::AddOp>([&](auto op)
+                                  { return printOperation(*this, op, skipStmtCheck); })
+          .Case<ruby::LocalVariableWriteOp>([&](auto op)
                                   { return printOperation(*this, op, skipStmtCheck); })
           .Default([&](Operation *)
                    { return op.emitOpError("unable to find printer for op"); });

@@ -5,4 +5,6 @@ module {
     %2 = ruby.add %1,%0 : (!ruby.int, !ruby.int) -> !ruby.int 
     // CHECK: 3 + 4
     %3 = ruby.add %0,%1 {rb_stmt = true} : (!ruby.int, !ruby.int) -> !ruby.int 
+    // CHECK-NEXT: foo = 3 + 4
+    %4 = ruby.local_variable_write "foo" = %3 {rb_stmt = true} : !ruby.int 
 }
