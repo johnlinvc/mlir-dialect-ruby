@@ -42,5 +42,4 @@ describe MLIR::Dialect::Ruby::PrismLoader do
     mod = loader.to_module
     parse_with_opt(mod)
   end
-
 end

@@ -40,7 +40,11 @@ module MLIR
         end
 
         def visit_call(node)
-          receiver = node.receiver ? visit(node.receiver) : nil
+          receiver = nil
+          if node.receiver
+            attr_queue << {}
+            receiver = visit(node.receiver)
+          end
           name = node.name
           args = visit_arguments(node.arguments)
           build_call_stmt(receiver, name, args)
@@ -48,6 +52,7 @@ module MLIR
 
         def visit_arguments(node)
           node.arguments.map do |arg|
+            attr_queue << {}
             visit(arg)
           end
         end
@@ -114,6 +119,7 @@ module MLIR
         def pop_gen_attr_dict
           attr_dict = attr_queue.pop
           return "" unless attr_dict
+
           res = "{"
           body_pairs = attr_dict.each.map do |key, value|
             "#{key} = #{value.inspect}"
@@ -126,13 +132,28 @@ module MLIR
         def with_new_ssa_var
           ret = "%#{ssa_prefix}#{@ssa_counter}"
           raise "must have a block" unless block_given?
-
-          type = yield ret
+          attr_dict = pop_gen_attr_dict
+          type = yield ret,attr_dict
           @ssa_counter += 1
           SSARetValue.new(ret, type)
         end
 
         # Build MLIR statements
+
+        # TODO: Use MLIR for this specialization instead
+        PLUS_STMT_TPL_STR = <<~PLUS_STMT_TPL.strip
+          <%= ssa_var %> = ruby.add <%= lhs.ssa_var %>\
+          , <%= rhs.ssa_var %> <%= attr_dict %> :\
+          (!ruby.int, !ruby.int) -> !ruby.int
+        PLUS_STMT_TPL
+        PLUS_STMT_TPL = ERB.new(PLUS_STMT_TPL_STR)
+        def build_plus_stmt(lhs, rhs)
+          with_new_ssa_var do |ssa_var, attr_dict|
+            @stmts << PLUS_STMT_TPL.result(binding)
+            ret_type = "!ruby.int"
+            ret_type
+          end
+        end
 
         CALL_STMT_TPL_STR = <<~CALL_STMT_TPL.strip
           <%= ssa_var %> = ruby.call <%= receiver_info %>\
@@ -142,6 +163,10 @@ module MLIR
         CALL_STMT_TPL = ERB.new(CALL_STMT_TPL_STR)
 
         def build_call_stmt(receiver, name, args)
+          plus_optimize = name == :'+' && receiver && args.size == 1
+          if plus_optimize
+            return build_plus_stmt(receiver, args[0])
+          end
           with_new_ssa_var do |ssa_var|
             receiver_info = receiver ? "#{receiver.ssa_var} : #{receiver.type} " : ""
             args_ssa_values = args.map(&:ssa_var).join(", ")
@@ -152,9 +177,14 @@ module MLIR
           end
         end
 
+        LOCAL_VAR_WRITE_TPL_STR = <<~LOCAL_VAR_WRITE_TPL.strip
+          <%= ssa_var %> = ruby.local_variable_write "<%= name %>"\
+          = <%= value.ssa_var %> <%= attr_dict %> : <%= value.type %>
+        LOCAL_VAR_WRITE_TPL
+        LOCAL_VAR_WRITE_TPL = ERB.new(LOCAL_VAR_WRITE_TPL_STR)
         def build_local_variable_write_stmt(name, value)
-          with_new_ssa_var do |ssa_var|
-            @stmts << "  #{ssa_var} = ruby.local_variable_write \"#{name}\" = #{value.ssa_var} #{pop_gen_attr_dict}: #{value.type} "
+          with_new_ssa_var do |ssa_var, attr_dict|
+            @stmts << LOCAL_VAR_WRITE_TPL.result(binding)
             value.type
           end
         end
@@ -169,9 +199,9 @@ module MLIR
 
         def build_int_stmt(value)
           # MLIR::CAPI.mlirBuildIntLit(@context, MLIR::CAPI.mlirIntegerTypeGet(@context, 64), value)
-          with_new_ssa_var do |ssa_var|
+          with_new_ssa_var do |ssa_var, attr_dict|
             ret_type = "!ruby.int"
-            @stmts << "  #{ssa_var} = ruby.constant_int \"#{value}\" #{pop_gen_attr_dict} : #{ret_type}"
+            @stmts << "  #{ssa_var} = ruby.constant_int \"#{value}\" #{attr_dict} : #{ret_type}"
             ret_type
           end
         end
@@ -254,12 +284,21 @@ module MLIR
           @ast = Prism.parse(@prog)
           @visitor = PrismVisitor.new
         end
+        MODULE_TPL = <<~ERB
+          module {
+          <%= stmts.join("\n") %>
+          }
+        ERB
+        def module_from_stmts(stmts)
+          ERB.new(MODULE_TPL).result(binding)
+        end
 
         def to_module
           @visitor.visit(@ast.value)
           # pp @ast.value
           # puts @visitor.stmts
-          @visitor.stmts
+          stmts = @visitor.stmts
+          module_from_stmts(stmts)
         end
       end
     end

@@ -11,11 +11,9 @@ require "minitest/autorun"
 require "english"
 
 module MLIRHelper
-  def parse_with_opt(stmts)
+  def parse_with_opt(mod)
     Tempfile.create("test") do |f|
-      f.write("module {\n")
-      f.write(stmts.join("\n"))
-      f.write("\n}")
+      f.write(mod)
       f.close
       opt_cmd = File.expand_path("../ext/mlir-ruby/build/bin/ruby-opt", __dir__)
       out = `#{opt_cmd} #{f.path}`
