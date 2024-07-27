@@ -17,7 +17,7 @@ namespace :dialect do
   prefix = ENV.fetch("MLIR_PREFIX", relative_prefix)
   build_dir = "./ext/mlir-ruby/build"
   cmake_vars = {
-    "MLIR_DIR" => "#{prefix}../mlir/lib/cmake/mlir",
+    "MLIR_DIR" => "#{prefix}/../mlir/lib/cmake/mlir",
     "LLVM_BINARY_DIR" => prefix,
     "LLVM_MAIN_SRC_DIR" => "#{prefix}/../llvm",
     "LLVM_EXTERNAL_LIT" => "#{prefix}/bin/llvm-lit",
@@ -32,9 +32,9 @@ namespace :dialect do
   desc "configure using cmake"
   task :configure do
     FileUtils.mkdir_p build_dir
-    ENV["LDFLAGS"] ||= "-L/opt/homebrew/opt/llvm/lib"
-    ENV["CPPFLAGS"] ||= "-I/opt/homebrew/opt/llvm/include"
-    ENV["PATH"] = "/opt/homebrew/opt/llvm/bin:#{ENV.fetch("PATH", nil)}"
+    ENV["LDFLAGS"] ||= "-L#{prefix}/lib"
+    ENV["CPPFLAGS"] ||= "-I#{prefix}/include"
+    ENV["PATH"] = "#{prefix}/bin:#{ENV.fetch("PATH", nil)}"
     cmake_vars_str = cmake_vars.map { |k, v| "-D#{k}=#{v}" }.join(" ")
     cmd = "cmake -G 'Unix Makefiles' .. #{cmake_vars_str}}"
     system(cmd, chdir: build_dir)

@@ -9,6 +9,7 @@ add_mlir_dialect_library(MLIRRuby
 
         DEPENDS
         MLIRRubyOpsIncGen
+        MLIRRubyPatternsIncGen
         MLIRRubyPassesIncGen
 
         LINK_LIBS PUBLIC
