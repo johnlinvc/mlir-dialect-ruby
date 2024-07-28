@@ -10,6 +10,7 @@
 #include "mlir/Rewrite/FrozenRewritePatternSet.h"
 #include "mlir/Support/LogicalResult.h"
 #include "mlir/Transforms/GreedyPatternRewriteDriver.h"
+#include "llvm/Support/Debug.h"
 
 #include "Ruby/RubyPasses.h"
 
@@ -53,17 +54,25 @@ public:
   using OpRewritePattern<CallOp>::OpRewritePattern;
   LogicalResult matchAndRewrite(CallOp op,
                                 PatternRewriter &rewriter) const final {
-    if (op.getMethodName() != "+") {
+    auto methodName = op.getMethodName();
+    if (methodName != "+") {
       return failure();
     }
     if (op.getArgs().size() != 1) {
       return failure();
     }
-    if (op.getCallee() == ::mlir::Value()) {
+    auto lhs = op.getCallee();
+    if (lhs == ::mlir::Value()) {
       return failure();
     }
+    auto rhs = op.getArgs()[0];
+    if (!lhs.getType().isa<ruby::IntegerType>() ||
+        !rhs.getType().isa<ruby::IntegerType>()) {
+      return failure();
+    }
+    auto resultType = op.getResult().getType();
     rewriter.replaceOpWithNewOp<AddOp>(
-        op, op.getCallee(), op.getArgs()[0]);
+        op, resultType, lhs, rhs);
     
     return success();
   }

@@ -27,7 +27,7 @@ def RubySwitchBarFoo: Pass<"ruby-switch-bar-foo", "::mlir::ModuleOp"> {
   }];
 }
 
-def RubyCallToArith: Pass<"ruby-call-to-Arith", "::mlir::ModuleOp"> {
+def RubyCallToArith: Pass<"ruby-call-to-arith", "::mlir::ModuleOp"> {
   let summary = "Replace call operations with arith operations.";
   let description = [{
     Change call operations to arith operations.
