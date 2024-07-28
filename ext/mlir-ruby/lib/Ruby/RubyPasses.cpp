@@ -47,6 +47,29 @@ public:
   }
 };
 
+namespace {
+class RubyRewriteCallWithAdd : public OpRewritePattern<CallOp> {
+public:
+  using OpRewritePattern<CallOp>::OpRewritePattern;
+  LogicalResult matchAndRewrite(CallOp op,
+                                PatternRewriter &rewriter) const final {
+    if (op.getMethodName() != "+") {
+      return failure();
+    }
+    if (op.getArgs().size() != 1) {
+      return failure();
+    }
+    if (op.getCallee() == ::mlir::Value()) {
+      return failure();
+    }
+    rewriter.replaceOpWithNewOp<AddOp>(
+        op, op.getCallee(), op.getArgs()[0]);
+    
+    return success();
+  }
+};
+}
+
 class RubyCallToArith :
  public impl::RubyCallToArithBase<RubyCallToArith> {
   public:
