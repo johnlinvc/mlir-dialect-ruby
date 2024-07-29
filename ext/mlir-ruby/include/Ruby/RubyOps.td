@@ -26,10 +26,24 @@ def Ruby_LocalVariableWriteOp : Ruby_Op<"local_variable_write", [SameOperandsAnd
     let arguments = (ins StrAttr:$var_name, Ruby_AnyType:$input);
     let results = (outs Ruby_AnyType:$res);
 
+
     let assemblyFormat = [{
         $var_name `=` $input attr-dict `:` type($res)
     }];
 }
+
+def Ruby_CastOp : Ruby_Op<"cast", [Pure]
+  > {
+  let summary = "type cast operation";
+  let description = [{
+    cast from known ruby type to opaque object
+  }];
+
+  let arguments = (ins Ruby_AnyType:$input);
+  let results = (outs Ruby_AnyType:$output);
+  let assemblyFormat = "$input attr-dict `:` type($input) `->` type($output)";
+}
+
 
 def Ruby_ConstantStrOp : Ruby_Op<"constant_str", []> {
     let arguments = (ins StrAttr:$input);

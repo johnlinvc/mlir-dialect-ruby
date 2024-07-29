@@ -17,6 +17,7 @@
 namespace mlir::ruby {
 #define GEN_PASS_DEF_RUBYSWITCHBARFOO
 #define GEN_PASS_DEF_RUBYCALLTOARITH
+#define GEN_PASS_DEF_RUBYTYPEINFER
 #include "Ruby/RubyPasses.h.inc"
 #include "Ruby/RubyPatterns.h.inc"
 
@@ -49,6 +50,39 @@ public:
 };
 
 namespace {
+class RubyRewriteLocalVarWriteRetType : public OpRewritePattern<LocalVariableWriteOp> {
+public:
+  using OpRewritePattern<LocalVariableWriteOp>::OpRewritePattern;
+  LogicalResult matchAndRewrite(LocalVariableWriteOp op,
+                                PatternRewriter &rewriter) const final {
+    auto inputOp = op.getInput().getDefiningOp<CastOp>();
+    if (!inputOp) {
+      return failure();
+    }
+    auto newOp = rewriter.create<LocalVariableWriteOp>(
+        op.getLoc(), inputOp.getInput().getType(), op.getVarName(), inputOp.getInput());
+    newOp->setAttrs(op->getAttrs());
+    rewriter.replaceOp(op, newOp.getOperation());
+    
+    return success();
+  }
+};
+}
+
+class RubyTypeInfer :
+ public impl::RubyTypeInferBase<RubyTypeInfer> {
+  public:
+  using impl::RubyTypeInferBase<RubyTypeInfer>::RubyTypeInferBase;
+  void runOnOperation() final {
+    RewritePatternSet patterns(&getContext());
+    patterns.add<RubyRewriteLocalVarWriteRetType>(&getContext());
+    FrozenRewritePatternSet patternSet(std::move(patterns));
+    if (failed(applyPatternsAndFoldGreedily(getOperation(), patternSet)))
+      signalPassFailure();
+  }
+};
+
+namespace {
 class RubyRewriteCallWithAdd : public OpRewritePattern<CallOp> {
 public:
   using OpRewritePattern<CallOp>::OpRewritePattern;
@@ -70,14 +104,16 @@ public:
         !rhs.getType().isa<ruby::IntegerType>()) {
       return failure();
     }
-    auto resultType = op.getResult().getType();
-    rewriter.replaceOpWithNewOp<AddOp>(
-        op, resultType, lhs, rhs);
+    auto resultType = lhs.getType();
+    auto newAdd = rewriter.create<AddOp>(op.getLoc(), resultType, lhs, rhs);
+    rewriter.replaceOpWithNewOp<CastOp>(
+        op, op.getRes().getType(), newAdd);
     
     return success();
   }
 };
 }
+
 
 class RubyCallToArith :
  public impl::RubyCallToArithBase<RubyCallToArith> {

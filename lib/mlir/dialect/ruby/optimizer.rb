@@ -39,8 +39,11 @@ module MLIR
             f.write(mod)
             f.close
             opt_cmd = File.expand_path("../../../../ext/mlir-ruby/build/bin/ruby-opt", __dir__)
-            out = `#{opt_cmd} --canonicalize #{f.path}`
+            out = `#{opt_cmd} --ruby-call-to-arith --ruby-type-infer --canonicalize #{f.path}`
             raise "opt failed: #{out}" unless $CHILD_STATUS.success?
+
+            puts "mlir after opt"
+            system("cat #{f.path}")
 
             out
           end

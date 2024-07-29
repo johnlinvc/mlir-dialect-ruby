@@ -142,33 +142,16 @@ module MLIR
 
         # Build MLIR statements
 
-        # TODO: Use MLIR for this specialization instead
-        PLUS_STMT_TPL_STR = <<~PLUS_STMT_TPL.strip
-          <%= ssa_var %> = ruby.add <%= lhs.ssa_var %>\
-          , <%= rhs.ssa_var %> <%= attr_dict %> :\
-          (!ruby.int, !ruby.int) -> !ruby.int
-        PLUS_STMT_TPL
-        PLUS_STMT_TPL = ERB.new(PLUS_STMT_TPL_STR)
-        def build_plus_stmt(lhs, rhs)
-          with_new_ssa_var do |ssa_var, attr_dict|
-            @stmts << PLUS_STMT_TPL.result(binding)
-            ret_type = "!ruby.int"
-            ret_type
-          end
-        end
-
         CALL_STMT_TPL_STR = <<~CALL_STMT_TPL.strip
           <%= ssa_var %> = ruby.call <%= receiver_info %>\
           -> "<%= name %>"(<%= args_ssa_values %>) \
+          <%= attr_dict %> \
           : (<%= arg_types %>) -> <%= ret_type %>
         CALL_STMT_TPL
         CALL_STMT_TPL = ERB.new(CALL_STMT_TPL_STR)
 
         def build_call_stmt(receiver, name, args)
-          plus_optimize = name == :+ && receiver && args.size == 1
-          return build_plus_stmt(receiver, args[0]) if plus_optimize
-
-          with_new_ssa_var do |ssa_var|
+          with_new_ssa_var do |ssa_var, attr_dict|
             receiver_info = receiver ? "#{receiver.ssa_var} : #{receiver.type} " : ""
             args_ssa_values = args.map(&:ssa_var).join(", ")
             arg_types = args.map(&:type).join(", ")
