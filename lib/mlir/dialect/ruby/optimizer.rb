@@ -42,8 +42,8 @@ module MLIR
             out = `#{opt_cmd} --ruby-call-to-arith --ruby-type-infer --canonicalize #{f.path}`
             raise "opt failed: #{out}" unless $CHILD_STATUS.success?
 
-            puts "mlir after opt"
-            system("cat #{f.path}")
+            # puts "mlir after opt"
+            # system("cat #{f.path}")
 
             out
           end
