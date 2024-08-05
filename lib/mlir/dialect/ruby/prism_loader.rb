@@ -267,6 +267,7 @@ module MLIR
           @prog = program
           @ast = Prism.parse(@prog)
           @visitor = PrismVisitor.new
+          @module = nil
         end
         MODULE_TPL = <<~ERB
           module {
@@ -278,11 +279,12 @@ module MLIR
         end
 
         def to_module
+          return @module if @module
           @visitor.visit(@ast.value)
           # pp @ast.value
           # puts @visitor.stmts
           stmts = @visitor.stmts
-          module_from_stmts(stmts)
+          @module = module_from_stmts(stmts)
         end
       end
     end

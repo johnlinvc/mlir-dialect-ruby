@@ -32,8 +32,8 @@ namespace :dialect do
   desc "configure using cmake"
   task :configure do
     FileUtils.mkdir_p build_dir
-    ENV["LDFLAGS"] ||= "-L/opt/homebrew/opt/llvm/lib"
-    ENV["CPPFLAGS"] ||= "-I/opt/homebrew/opt/llvm/include"
+    #ENV["LDFLAGS"] ||= "-L/opt/homebrew/opt/llvm/lib"
+    #ENV["CPPFLAGS"] ||= "-I/opt/homebrew/opt/llvm/include"
     ENV["PATH"] = "/opt/homebrew/opt/llvm/bin:#{ENV.fetch("PATH", nil)}"
     cmake_vars_str = cmake_vars.map { |k, v| "-D#{k}=#{v}" }.join(" ")
     cmd = "cmake -G 'Unix Makefiles' .. #{cmake_vars_str}}"
