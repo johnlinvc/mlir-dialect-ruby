@@ -11,6 +11,7 @@
 
 include "mlir/IR/AttrTypeBase.td"
 include "Ruby/RubyDialect.td"
+include "mlir/Bytecode/BytecodeOpInterface.td"
 
 //===----------------------------------------------------------------------===//
 // Ruby type definitions

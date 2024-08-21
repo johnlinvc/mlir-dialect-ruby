@@ -12,6 +12,7 @@
 include "Ruby/RubyTypes.td"
 include "mlir/Interfaces/SideEffectInterfaces.td"
 include "mlir/Interfaces/InferTypeOpInterface.td"
+include "mlir/Bytecode/BytecodeOpInterface.td"
 
 def Ruby_LocalVariableReadOp : Ruby_Op<"local_variable_read", []> {
     let arguments = (ins StrAttr:$var_name);

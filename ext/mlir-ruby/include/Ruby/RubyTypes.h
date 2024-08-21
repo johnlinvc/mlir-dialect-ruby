@@ -10,6 +10,7 @@
 #define RUBY_RUBYTYPES_H
 
 #include "mlir/IR/BuiltinTypes.h"
+#include "mlir/Bytecode/BytecodeOpInterface.h"
 
 #define GET_TYPEDEF_CLASSES
 #include "Ruby/RubyOpsTypes.h.inc"
