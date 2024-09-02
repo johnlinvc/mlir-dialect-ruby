@@ -7,3 +7,5 @@
 /spec/reports/
 /tmp/
 /ext/standalone/build/
+ext/llvm-project.build/**
+!ext/llvm-project.build/configure.sh
