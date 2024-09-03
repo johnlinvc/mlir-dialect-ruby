@@ -50,8 +50,8 @@ module {
         return
     }
 
-    // CHECK-LABEL: func @ruby_string_type(%arg0: !ruby.string<"abc">)
-    func.func @ruby_string_type(%arg0: !ruby.string<"abc">) {
+    // CHECK-LABEL: func @ruby_string_type(%arg0: !ruby.string)
+    func.func @ruby_string_type(%arg0: !ruby.string) {
         return
     }
 }
