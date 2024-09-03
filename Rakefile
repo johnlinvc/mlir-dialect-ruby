@@ -13,7 +13,7 @@ RuboCop::RakeTask.new
 task default: %i[test rubocop]
 
 namespace :dialect do
-  relative_prefix = File.expand_path("../llvm-project/build", __dir__)
+  relative_prefix = File.expand_path("ext/llvm-project.build", __dir__)
   prefix = ENV.fetch("MLIR_PREFIX", relative_prefix)
   ENV["PATH"] = "#{prefix}/bin:#{ENV.fetch("PATH", nil)}"
   build_dir = "./ext/mlir-ruby/build"
