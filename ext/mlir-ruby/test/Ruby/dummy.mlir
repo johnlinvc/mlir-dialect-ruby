@@ -4,8 +4,6 @@ module {
     // CHECK-LABEL: func @bar()
     func.func @bar() {
         %0 = arith.constant 1 : i32
-        // CHECK: %{{.*}} = ruby.foo %{{.*}} : i32
-        %res = ruby.foo %0 : i32
 
         // CHECK: %{{.*}} = ruby.constant_int "1" : !ruby.int
         %1 = ruby.constant_int "1" : !ruby.int
