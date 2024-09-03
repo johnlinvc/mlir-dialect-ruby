@@ -22,13 +22,6 @@ class Ruby_Type<string name, string typeMnemonic, list<Trait> traits = []>
   let mnemonic = typeMnemonic;
 }
 
-def Ruby_CustomType : Ruby_Type<"Custom", "custom"> {
-    let summary = "Ruby custom type";
-    let description = "Custom type in ruby dialect";
-    let parameters = (ins StringRefParameter<"the custom value">:$value);
-    let assemblyFormat = "`<` $value `>`";
-}
-
 def Ruby_StringType : Ruby_Type<"String", "string"> {
     let summary = "Ruby string type";
     let description = "String type in ruby dialect";
