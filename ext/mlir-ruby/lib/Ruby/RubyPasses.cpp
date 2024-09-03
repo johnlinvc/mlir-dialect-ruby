@@ -22,32 +22,6 @@ namespace mlir::ruby {
 #include "Ruby/RubyPatterns.h.inc"
 
 namespace {
-class RubySwitchBarFooRewriter : public OpRewritePattern<func::FuncOp> {
-public:
-  using OpRewritePattern<func::FuncOp>::OpRewritePattern;
-  LogicalResult matchAndRewrite(func::FuncOp op,
-                                PatternRewriter &rewriter) const final {
-    if (op.getSymName() == "bar") {
-      rewriter.modifyOpInPlace(op, [&op]() { op.setSymName("foo"); });
-      return success();
-    }
-    return failure();
-  }
-};
-
-class RubySwitchBarFoo
-    : public impl::RubySwitchBarFooBase<RubySwitchBarFoo> {
-public:
-  using impl::RubySwitchBarFooBase<
-      RubySwitchBarFoo>::RubySwitchBarFooBase;
-  void runOnOperation() final {
-    RewritePatternSet patterns(&getContext());
-    patterns.add<RubySwitchBarFooRewriter>(&getContext());
-    FrozenRewritePatternSet patternSet(std::move(patterns));
-    if (failed(applyPatternsAndFoldGreedily(getOperation(), patternSet)))
-      signalPassFailure();
-  }
-};
 
 namespace {
 class RubyRewriteLocalVarWriteRetType : public OpRewritePattern<LocalVariableWriteOp> {
