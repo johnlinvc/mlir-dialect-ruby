@@ -45,8 +45,8 @@ module {
     } : !ruby.sym
 
 
-    // CHECK-LABEL: func @ruby_types(%arg0: !ruby.custom<"10">, %arg1: !ruby.int<"10">)
-    func.func @ruby_types(%arg0: !ruby.custom<"10">, %arg1: !ruby.int<"10">) {
+    // CHECK-LABEL: func @ruby_types(%arg0: !ruby.custom<"10">, %arg1: !ruby.int)
+    func.func @ruby_types(%arg0: !ruby.custom<"10">, %arg1: !ruby.int) {
         return
     }
 
